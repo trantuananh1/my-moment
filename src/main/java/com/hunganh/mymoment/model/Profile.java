@@ -16,6 +16,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 @NoArgsConstructor
 @Node
 public class Profile {
+    @Id
     private long userId;
     private String firstName;
     private String lastName;

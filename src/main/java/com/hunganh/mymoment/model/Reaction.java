@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 @Data
@@ -12,6 +13,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 @NoArgsConstructor
 @Node
 public class Reaction {
+    @Id
     private long userId;
     private int type;
 }
