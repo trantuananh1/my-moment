@@ -3,6 +3,7 @@ package com.hunganh.mymoment.controller;
 import com.hunganh.mymoment.dto.AuthenticationResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
+import com.hunganh.mymoment.dto.SuccessResponse;
 import com.hunganh.mymoment.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
         authService.signup(signUpRequest);
-        return new ResponseEntity<>("User Registration Successful",
-                OK);
+        return new ResponseEntity<>("Success", OK);
     }
 
     @PostMapping("/login")

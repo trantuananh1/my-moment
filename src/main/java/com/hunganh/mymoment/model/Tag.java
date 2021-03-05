@@ -9,6 +9,8 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,6 +22,6 @@ public class Tag {
     private long id;
     private String name;
 
-    @Relationship(type = "BELONG_POST")
-    private Post post;
+    @Relationship(type = "HAS_POST")
+    private Set<Post> posts;
 }

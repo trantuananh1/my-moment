@@ -25,7 +25,5 @@ public class Profile {
     private String biography;
     private String gender;
     private String dateOfBirth;
-    private long dateCreated;
-    private long dateUpdated;
-    private String lastIp;
+
 }
