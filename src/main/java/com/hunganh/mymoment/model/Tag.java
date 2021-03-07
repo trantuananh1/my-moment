@@ -8,6 +8,9 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
+
+import java.util.Set;
 
 @Data
 @Builder
@@ -16,10 +19,10 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 @Node
 public class Tag {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(UUIDStringGenerator.class)
+    private String id;
     private String name;
 
-    @Relationship(type = "BELONG_POST")
-    private Post post;
+    @Relationship(type = "HAS_POST")
+    private Set<Post> posts;
 }

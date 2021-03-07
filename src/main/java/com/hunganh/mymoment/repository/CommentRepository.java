@@ -4,5 +4,5 @@ import com.hunganh.mymoment.model.Comment;
 import com.hunganh.mymoment.model.User;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 
-public interface CommentRepository extends Neo4jRepository<Comment, Long> {
+public interface CommentRepository extends Neo4jRepository<Comment, String> {
 }

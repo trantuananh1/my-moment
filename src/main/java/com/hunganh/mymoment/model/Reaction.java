@@ -14,6 +14,6 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Node
 public class Reaction {
     @Id
-    private long userId;
+    private String userId;
     private int type;
 }

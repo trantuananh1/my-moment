@@ -3,13 +3,11 @@ package com.hunganh.mymoment.controller;
 import com.hunganh.mymoment.dto.AuthenticationResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
+import com.hunganh.mymoment.dto.SuccessResponse;
 import com.hunganh.mymoment.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -22,8 +20,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
         authService.signup(signUpRequest);
-        return new ResponseEntity<>("User Registration Successful",
-                OK);
+        return new ResponseEntity<>("Success", OK);
     }
 
     @PostMapping("/login")
@@ -31,9 +28,10 @@ public class AuthController {
         return authService.login(loginRequest);
     }
 
-    @PostMapping("/verify/{token}")
-    public ResponseEntity<String> verify() {
-        return new ResponseEntity<>("", OK);
+    @GetMapping("/verify/{token}")
+    public ResponseEntity<String> verify(@PathVariable String token) {
+        authService.verifyAccount(token);
+        return new ResponseEntity<>("Account Activated Successfully", OK);
     }
 
     @PostMapping("/send_email")

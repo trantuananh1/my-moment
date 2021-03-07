@@ -3,15 +3,29 @@ package com.hunganh.mymoment.service;
 import com.hunganh.mymoment.dto.AuthenticationResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
+import com.hunganh.mymoment.exception.MyMomentsException;
+import com.hunganh.mymoment.model.NotificationEmail;
 import com.hunganh.mymoment.model.Profile;
 import com.hunganh.mymoment.model.User;
+import com.hunganh.mymoment.model.VerificationToken;
 import com.hunganh.mymoment.repository.ProfileRepository;
 import com.hunganh.mymoment.repository.UserRepository;
+import com.hunganh.mymoment.repository.VerificationTokenRepository;
+import com.hunganh.mymoment.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -19,27 +33,87 @@ import java.util.Date;
 public class AuthService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
-    public void signup(SignUpRequest signUpRequest){
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+
+    public void signup(SignUpRequest signUpRequest) {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
-        user.setEmail(signUpRequest.getEmail());
-        user.setSaltedPassword(signUpRequest.getPassword());
+        user.setSaltedPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setDateCreated(new Date().getTime());
+        user.setDateUpdated(new Date().getTime());
+        user.setLastIp("");
         userRepository.save(user);
 
-        user = userRepository.findByUsername(user.getUsername());
         Profile profile = new Profile();
-        profile.setFirstName(signUpRequest.getFirstName());
-        profile.setLastName(signUpRequest.getLastName());
-        profile.setGender(signUpRequest.getGender());
-        profile.setDateOfBirth(signUpRequest.getDateOfBirth());
-        profile.setDateCreated(new Date().getTime());
-        profile.setDateUpdated(new Date().getTime());
+        profile.setUserId(user.getId());
+        profile.setEmail(signUpRequest.getEmail());
+        profile.setFullName(signUpRequest.getFullName());
         profileRepository.save(profile);
 
-//        mailService.sendMail(new NotificationEmail("helo", registerRequest.getEmail(), "content"));
+        user.hasProfile(profile);
+        userRepository.save(user);
+
+        String token = generateVerificationToken(user);
+        mailService.sendMail(new NotificationEmail("Activate your Account",
+                profile.getEmail(), "Thank you for signing up to My Moments with username <b>"+user.getUsername()+"</b>, " +
+                "please click on the below url to activate your account : " +
+                "http://localhost:8081/api/auth/verify/" + token));
     }
 
     public AuthenticationResponse login(LoginRequest loginRequest) {
-        return new AuthenticationResponse();
+
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String token = jwtProvider.generateToken(authenticate);
+        return new AuthenticationResponse(token, loginRequest.getUsername());
     }
+
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        fetchUserAndEnable(verificationToken.orElseThrow(() -> new MyMomentsException("Invalid Token")));
+    }
+
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new MyMomentsException("User not found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    private String generateVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+
+        verificationTokenRepository.save(verificationToken);
+        return token;
+    }
+
+    @Bean
+    CommandLineRunner demo(UserRepository userRepository) {
+        return args -> {
+
+//            userRepository.deleteAll();
+
+//            User greg = new User();
+//            greg.setUsername("anhtrt");
+//            User roy = new User();
+//            roy.setUsername("roy");
+//            User craig = new User();
+//            craig.setUsername("craig");
+//
+//            userRepository.save(greg);
+//            userRepository.save(roy);
+//            userRepository.save(craig);
+
+        };
+    }
+
+
 }
