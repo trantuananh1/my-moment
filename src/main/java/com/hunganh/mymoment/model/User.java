@@ -1,5 +1,6 @@
 package com.hunganh.mymoment.model;
 
+import com.hunganh.mymoment.dto.SignUpRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +11,10 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 import javax.persistence.UniqueConstraint;
-import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 @Data
@@ -22,10 +24,9 @@ import java.util.Set;
 @Node
 public class User {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(UUIDStringGenerator.class)
+    private String id;
     private String username;
-    private String email;
     private String saltedPassword;
     @CreatedDate
     private long dateCreated;

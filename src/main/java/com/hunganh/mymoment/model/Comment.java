@@ -8,6 +8,7 @@ import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 @Data
 @Builder
@@ -16,8 +17,8 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 @Node
 public class Comment {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(UUIDStringGenerator.class)
+    private String id;
     private String comment;
 
     @Relationship(type = "BELONG_POST")

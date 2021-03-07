@@ -42,7 +42,6 @@ public class AuthService {
     public void signup(SignUpRequest signUpRequest) {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
-        user.setEmail(signUpRequest.getEmail());
         user.setSaltedPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setDateCreated(new Date().getTime());
         user.setDateUpdated(new Date().getTime());
@@ -51,18 +50,16 @@ public class AuthService {
 
         Profile profile = new Profile();
         profile.setUserId(user.getId());
-        profile.setFirstName(signUpRequest.getFirstName());
-        profile.setLastName(signUpRequest.getLastName());
-        profile.setGender(signUpRequest.getGender());
-        profile.setDateOfBirth(signUpRequest.getDateOfBirth());
+        profile.setEmail(signUpRequest.getEmail());
+        profile.setFullName(signUpRequest.getFullName());
         profileRepository.save(profile);
 
         user.hasProfile(profile);
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
-        mailService.sendMail(new NotificationEmail("Please Activate your Account",
-                user.getEmail(), "Thank you for signing up to My Moments, " +
+        mailService.sendMail(new NotificationEmail("Activate your Account",
+                profile.getEmail(), "Thank you for signing up to My Moments with username <b>"+user.getUsername()+"</b>, " +
                 "please click on the below url to activate your account : " +
                 "http://localhost:8081/api/auth/verify/" + token));
     }

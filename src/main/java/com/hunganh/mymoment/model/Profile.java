@@ -17,9 +17,9 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Node
 public class Profile {
     @Id
-    private long userId;
-    private String firstName;
-    private String lastName;
+    private String userId;
+    private String email;
+    private String fullName;
     private String city;
     private String country;
     private String biography;
