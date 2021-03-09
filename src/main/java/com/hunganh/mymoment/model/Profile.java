@@ -19,6 +19,7 @@ public class Profile {
     @Id
     private String userId;
     private String email;
+    private String avatarPath;
     private String fullName;
     private String city;
     private String country;

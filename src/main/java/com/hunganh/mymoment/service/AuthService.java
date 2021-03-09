@@ -15,17 +15,18 @@ import com.hunganh.mymoment.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -95,25 +96,12 @@ public class AuthService {
         return token;
     }
 
-    @Bean
-    CommandLineRunner demo(UserRepository userRepository) {
-        return args -> {
 
-//            userRepository.deleteAll();
-
-//            User greg = new User();
-//            greg.setUsername("anhtrt");
-//            User roy = new User();
-//            roy.setUsername("roy");
-//            User craig = new User();
-//            craig.setUsername("craig");
-//
-//            userRepository.save(greg);
-//            userRepository.save(roy);
-//            userRepository.save(craig);
-
-        };
+    public Map<String, Object> attempt(SignUpRequest signUpRequest) {
+        Map<String, Object> result=new HashMap<>();
+        List<User> users=userRepository.findAll();
+        result.put("as", "as");
+        result.put("User", users);
+        return result;
     }
-
-
 }
