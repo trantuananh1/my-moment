@@ -1,9 +1,12 @@
 package com.hunganh.mymoment.model;
 
+import com.sn.appbase.model.SnwObject;
+import com.sn.appbase.model.SnwObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -13,15 +16,12 @@ import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 import java.util.Set;
 
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Node
-public class Tag {
-    @Id
-    @GeneratedValue(UUIDStringGenerator.class)
-    private String id;
-    private String name;
+public class Tag extends SnwObject {
+    private String content;
 
     @Relationship(type = "HAS_POST")
     private Set<Post> posts;

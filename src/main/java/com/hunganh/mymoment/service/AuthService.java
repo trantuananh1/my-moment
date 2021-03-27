@@ -8,9 +8,11 @@ import com.hunganh.mymoment.model.NotificationEmail;
 import com.hunganh.mymoment.model.Profile;
 import com.hunganh.mymoment.model.User;
 import com.hunganh.mymoment.model.VerificationToken;
+import com.hunganh.mymoment.model.assoc.VerificationOwnership;
 import com.hunganh.mymoment.repository.ProfileRepository;
 import com.hunganh.mymoment.repository.UserRepository;
 import com.hunganh.mymoment.repository.VerificationTokenRepository;
+import com.hunganh.mymoment.repository.assoc.VerificationOwnershipRepository;
 import com.hunganh.mymoment.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -19,11 +21,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +38,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final VerificationOwnershipRepository verificationOwnershipRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
@@ -43,8 +48,6 @@ public class AuthService {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setSaltedPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-        user.setDateCreated(new Date().getTime());
-        user.setDateUpdated(new Date().getTime());
         user.setLastIp("");
         userRepository.save(user);
 
@@ -54,14 +57,26 @@ public class AuthService {
         profile.setFullName(signUpRequest.getFullName());
         profileRepository.save(profile);
 
-        user.hasProfile(profile);
-        userRepository.save(user);
+        user.setProfile(profile);
 
-        String token = generateVerificationToken(user);
+        VerificationToken verificationToken = generateVerificationToken(user);
         mailService.sendMail(new NotificationEmail("Activate your Account",
                 profile.getEmail(), "Thank you for signing up to My Moments with username <b>"+user.getUsername()+"</b>, " +
                 "please click on the below url to activate your account : " +
-                "http://localhost:8081/api/auth/verify/" + token));
+                "http://localhost:8081/api/auth/verify/" + verificationToken.getToken()));
+
+        VerificationOwnership verificationOwnership =new VerificationOwnership();
+        verificationOwnership.setStartNode(user);
+        verificationOwnership.setEndNode(verificationToken);
+        verificationOwnership.setTime(new Date().getTime());
+        verificationOwnershipRepository.save(verificationOwnership);
+        if (user.getVerificationOwnerships()==null){
+            user.setVerificationOwnerships(new HashSet<>());
+        }
+        user.getVerificationOwnerships().add(verificationOwnership);
+        userRepository.save(user);
+        verificationToken.setVerificationOwnerships(verificationOwnership);
+        verificationTokenRepository.save(verificationToken);
     }
 
     public AuthenticationResponse login(LoginRequest loginRequest) {
@@ -79,20 +94,27 @@ public class AuthService {
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {
-        String username = verificationToken.getUser().getUsername();
+        String username = verificationToken.getVerificationOwnerships().getStartNode().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new MyMomentsException("User not found with name - " + username));
         user.setEnabled(true);
         userRepository.save(user);
     }
 
-    private String generateVerificationToken(User user) {
+    private VerificationToken generateVerificationToken(User user) {
         String token = UUID.randomUUID().toString();
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setToken(token);
-        verificationToken.setUser(user);
 
         verificationTokenRepository.save(verificationToken);
-        return token;
+        return verificationToken;
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(principal.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
     }
 
     @Bean

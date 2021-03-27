@@ -1,33 +1,27 @@
 package com.hunganh.mymoment.model;
 
+import com.sn.appbase.model.SnwObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Id;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
-import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 import java.util.Set;
 
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Node
-public class Post {
-    @Id
-    @GeneratedValue(UUIDStringGenerator.class)
-    private String id;
+public class Post extends SnwObject {
     private String caption;
     private float latitude;
     private float longitude;
     private String imagePath;
     private String imageSize;
-    private long dateCreated;
-    private long dateUpdated;
 
     @Relationship(type = "BELONG_USER")
     private User user;
