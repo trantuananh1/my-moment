@@ -1,28 +1,28 @@
 package com.hunganh.mymoment.model;
 
+import com.sn.appbase.model.SnwObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Id;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
-import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
+
+import java.util.Set;
 
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Node
-public class Comment {
-    @Id
-    @GeneratedValue(UUIDStringGenerator.class)
-    private String id;
-    private String comment;
+public class Comment extends SnwObject {
+    private String content;
 
     @Relationship(type = "BELONG_POST")
     private Post post;
     @Relationship(type = "BELONG_USER")
     private User user;
+    @Relationship(type = "HAS_REACTION")
+    private Set<Reaction> reactions;
 }
