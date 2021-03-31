@@ -1,4 +1,4 @@
-package com.hunganh.mymoment.model;
+package com.hunganh.mymoment.model.object;
 
 import com.hunganh.mymoment.model.assoc.VerificationOwnership;
 import com.sn.appbase.model.SnwObject;
@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@ToString
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor

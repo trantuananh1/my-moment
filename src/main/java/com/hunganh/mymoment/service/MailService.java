@@ -1,7 +1,7 @@
 package com.hunganh.mymoment.service;
 
 import com.hunganh.mymoment.exception.MyMomentsException;
-import com.hunganh.mymoment.model.NotificationEmail;
+import com.hunganh.mymoment.model.object.NotificationEmail;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;

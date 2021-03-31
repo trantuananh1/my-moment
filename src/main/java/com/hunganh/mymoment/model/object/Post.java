@@ -1,17 +1,17 @@
-package com.hunganh.mymoment.model;
+package com.hunganh.mymoment.model.object;
 
 import com.sn.appbase.model.SnwObject;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@ToString
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,8 +20,7 @@ public class Post extends SnwObject {
     private String caption;
     private float latitude;
     private float longitude;
-    private String imagePath;
-    private String imageSize;
+    private List<String> imageUrls;
 
     @Relationship(type = "BELONG_USER")
     private User user;

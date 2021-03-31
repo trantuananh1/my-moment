@@ -1,22 +1,17 @@
 package com.hunganh.mymoment.controller;
 
 import com.hunganh.mymoment.dto.UploadFileResponse;
-import com.hunganh.mymoment.model.ImageMetadata;
-import com.hunganh.mymoment.model.User;
+import com.hunganh.mymoment.model.object.ImageMetadata;
+import com.hunganh.mymoment.model.object.User;
 import com.hunganh.mymoment.service.AuthService;
 import com.hunganh.mymoment.service.ImageService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
 
 /**
  * @Author: Tran Tuan Anh

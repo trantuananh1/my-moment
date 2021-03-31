@@ -1,14 +1,12 @@
 package com.hunganh.mymoment.model.assoc;
 
-import com.hunganh.mymoment.model.User;
-import com.hunganh.mymoment.model.VerificationToken;
+import com.hunganh.mymoment.model.object.User;
+import com.hunganh.mymoment.model.object.VerificationToken;
 import com.sn.appbase.model.SnwAssoc;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 
 /**

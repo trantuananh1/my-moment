@@ -4,10 +4,10 @@ import com.hunganh.mymoment.dto.AuthenticationResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
 import com.hunganh.mymoment.exception.MyMomentsException;
-import com.hunganh.mymoment.model.NotificationEmail;
-import com.hunganh.mymoment.model.Profile;
-import com.hunganh.mymoment.model.User;
-import com.hunganh.mymoment.model.VerificationToken;
+import com.hunganh.mymoment.model.object.NotificationEmail;
+import com.hunganh.mymoment.model.object.Profile;
+import com.hunganh.mymoment.model.object.User;
+import com.hunganh.mymoment.model.object.VerificationToken;
 import com.hunganh.mymoment.model.assoc.VerificationOwnership;
 import com.hunganh.mymoment.repository.ProfileRepository;
 import com.hunganh.mymoment.repository.UserRepository;
@@ -26,10 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -79,13 +76,14 @@ public class AuthService {
         verificationTokenRepository.save(verificationToken);
     }
 
-    public AuthenticationResponse login(LoginRequest loginRequest) {
-
+    public Map<String, Object> login(LoginRequest loginRequest) {
+        Map<String, Object> result = new HashMap<>();
         Authentication authenticate = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponse(token, loginRequest.getUsername());
+        result.put("Login", new AuthenticationResponse(token, loginRequest.getUsername()));
+        return result;
     }
 
     public void verifyAccount(String token) {

@@ -1,13 +1,12 @@
-package com.hunganh.mymoment.model;
+package com.hunganh.mymoment.model.object;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,5 +21,6 @@ public class Profile {
     private String biography;
     private String gender;
     private String dateOfBirth;
-
+    private String avatarUrl;
+    private String coverUrl;
 }

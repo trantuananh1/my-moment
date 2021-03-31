@@ -1,6 +1,6 @@
 package com.hunganh.mymoment.service;
 
-import com.hunganh.mymoment.model.User;
+import com.hunganh.mymoment.model.object.User;
 import com.hunganh.mymoment.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

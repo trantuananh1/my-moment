@@ -1,4 +1,4 @@
-package com.hunganh.mymoment.model;
+package com.hunganh.mymoment.model.object;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
@@ -14,7 +14,9 @@ import java.time.Instant;
  * @Created: Mon, 22/03/2021 1:07 AM
  **/
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
 @NoArgsConstructor

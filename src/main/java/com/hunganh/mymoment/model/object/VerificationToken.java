@@ -1,4 +1,4 @@
-package com.hunganh.mymoment.model;
+package com.hunganh.mymoment.model.object;
 
 import com.hunganh.mymoment.model.assoc.VerificationOwnership;
 import lombok.*;
@@ -13,6 +13,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

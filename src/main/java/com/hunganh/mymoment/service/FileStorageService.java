@@ -3,7 +3,7 @@ package com.hunganh.mymoment.service;
 import com.hunganh.mymoment.exception.InvalidFileException;
 import com.hunganh.mymoment.exception.InvalidFileNameException;
 import com.hunganh.mymoment.exception.StorageException;
-import com.hunganh.mymoment.model.ImageMetadata;
+import com.hunganh.mymoment.model.object.ImageMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,13 +1,15 @@
 package com.hunganh.mymoment.controller;
 
-import com.hunganh.mymoment.dto.AuthenticationResponse;
+import com.hunganh.mymoment.response.SnwSuccessResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
-import com.hunganh.mymoment.dto.SuccessResponse;
 import com.hunganh.mymoment.service.AuthService;
+import com.hunganh.mymoment.util.TemplateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -17,21 +19,22 @@ import static org.springframework.http.HttpStatus.OK;
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/signup")
+    @PostMapping(value = "/signup")
     public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
         authService.signup(signUpRequest);
-        return new ResponseEntity<>("Success", OK);
+        return new ResponseEntity(new SnwSuccessResponse(), OK);
     }
 
-    @PostMapping("/login")
-    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    @PostMapping(value = "/login", produces = "application/json")
+    public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
+        Map<String, Object> result = authService.login(loginRequest);
+        return new ResponseEntity(TemplateUtil.generateJson(result), OK);
     }
 
     @GetMapping("/verify/{token}")
     public ResponseEntity<String> verify(@PathVariable String token) {
         authService.verifyAccount(token);
-        return new ResponseEntity<>("Account Activated Successfully", OK);
+        return new ResponseEntity(new SnwSuccessResponse(), OK);
     }
 
     @PostMapping("/send_email")
