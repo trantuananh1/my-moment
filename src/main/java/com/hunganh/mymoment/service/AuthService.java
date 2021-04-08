@@ -1,20 +1,26 @@
 package com.hunganh.mymoment.service;
 
+import com.hunganh.mymoment.base.AssocBaseRepository;
 import com.hunganh.mymoment.dto.AuthenticationResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
+import com.hunganh.mymoment.exception.EmailAlreadyExistsException;
+import com.hunganh.mymoment.exception.EmailNotExistsException;
 import com.hunganh.mymoment.exception.MyMomentsException;
+import com.hunganh.mymoment.exception.UsernameAlreadyExistsException;
+import com.hunganh.mymoment.helper.MailHelper;
 import com.hunganh.mymoment.model.object.NotificationEmail;
 import com.hunganh.mymoment.model.object.Profile;
 import com.hunganh.mymoment.model.object.User;
 import com.hunganh.mymoment.model.object.VerificationToken;
-import com.hunganh.mymoment.model.assoc.VerificationOwnership;
 import com.hunganh.mymoment.repository.ProfileRepository;
 import com.hunganh.mymoment.repository.UserRepository;
 import com.hunganh.mymoment.repository.VerificationTokenRepository;
 import com.hunganh.mymoment.repository.assoc.VerificationOwnershipRepository;
 import com.hunganh.mymoment.security.JwtProvider;
+import com.sn.appbase.constant.SnwAssocType;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +37,7 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 @Transactional
+@Slf4j
 public class AuthService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
@@ -40,40 +47,53 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final AssocBaseRepository assocBaseRepository;
 
     public void signup(SignUpRequest signUpRequest) {
-        User user = new User();
-        user.setUsername(signUpRequest.getUsername());
-        user.setSaltedPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-        user.setLastIp("");
+        log.info("registering user {}", signUpRequest.getUsername());
+
+        User user = User.builder()
+                .username(signUpRequest.getUsername())
+                .saltedPassword(passwordEncoder.encode(signUpRequest.getPassword()))
+                .email(signUpRequest.getEmail())
+                .lastIp("")
+                .enabled(true)
+                .build();
+        boolean l1 = userRepository.existsByUsername(user.getUsername());
+        Optional<User> l2 = userRepository.existsForUsername(user.getUsername());
+//        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+//            log.warn("username {} already exists.", user.getUsername());
+//            throw new UsernameAlreadyExistsException(
+//                    String.format("username %s already exists", user.getUsername()));
+//        }
+//        if (userRepository.existsByEmail(user.getEmail())) {
+//            log.warn("email {} already exists.", user.getEmail());
+//            throw new EmailAlreadyExistsException(
+//                    String.format("email %s already exists", user.getEmail()));
+//        }
+//        if (!MailHelper.isAddressValid(user.getEmail())) {
+//            log.warn("email {} doesn't exist.", user.getEmail());
+//            throw new EmailNotExistsException(
+//                    String.format("email %s doesn't exist", user.getEmail()));
+//        }
         userRepository.save(user);
 
-        Profile profile = new Profile();
-        profile.setUserId(user.getId());
-        profile.setEmail(signUpRequest.getEmail());
-        profile.setFullName(signUpRequest.getFullName());
+        Profile profile = Profile.builder()
+                .userId(user.getId())
+                .email(signUpRequest.getEmail())
+                .fullName(signUpRequest.getFullName())
+                .build();
         profileRepository.save(profile);
 
         user.setProfile(profile);
 
         VerificationToken verificationToken = generateVerificationToken(user);
         mailService.sendMail(new NotificationEmail("Activate your Account",
-                profile.getEmail(), "Thank you for signing up to My Moments with username <b>"+user.getUsername()+"</b>, " +
+                profile.getEmail(), "Thank you for signing up to My Moments with username <b>" + user.getUsername() + "</b>, " +
                 "please click on the below url to activate your account : " +
                 "http://localhost:8081/api/auth/verify/" + verificationToken.getToken()));
+        assocBaseRepository.addAssoc(user, SnwAssocType.HAS_VERTIFICATION_TOKEN, verificationToken, "", new Date().getTime());
 
-        VerificationOwnership verificationOwnership =new VerificationOwnership();
-        verificationOwnership.setStartNode(user);
-        verificationOwnership.setEndNode(verificationToken);
-        verificationOwnership.setTime(new Date().getTime());
-        verificationOwnershipRepository.save(verificationOwnership);
-        if (user.getVerificationOwnerships()==null){
-            user.setVerificationOwnerships(new HashSet<>());
-        }
-        user.getVerificationOwnerships().add(verificationOwnership);
-        userRepository.save(user);
-        verificationToken.setVerificationOwnerships(verificationOwnership);
-        verificationTokenRepository.save(verificationToken);
     }
 
     public Map<String, Object> login(LoginRequest loginRequest) {
@@ -92,7 +112,7 @@ public class AuthService {
     }
 
     private void fetchUserAndEnable(VerificationToken verificationToken) {
-        String username = verificationToken.getVerificationOwnerships().getStartNode().getUsername();
+        String username = verificationToken.getVerificationOwnerships().iterator().next().getStartNode().getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new MyMomentsException("User not found with name - " + username));
         user.setEnabled(true);
         userRepository.save(user);

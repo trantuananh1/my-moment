@@ -2,6 +2,8 @@ package com.hunganh.mymoment.response;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @Author: Tran Tuan Anh
  * @Created: Wed, 31/03/2021 11:27 PM
@@ -10,12 +12,11 @@ import lombok.Data;
 @Data
 public class SnwAddResponse {
     private String offlineId;
-    private String objectId;
-    private long createdTime;
+    private String id;
+    private long createdTime=new Date().getTime();
 
-    public SnwAddResponse(String offlineId, String objectId, long createdTime){
+    public SnwAddResponse(String offlineId, String id){
         this.offlineId=offlineId;
-        this.objectId=objectId;
-        this.createdTime=createdTime;
+        this.id=id;
     }
 }

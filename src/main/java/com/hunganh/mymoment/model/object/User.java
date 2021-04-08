@@ -18,9 +18,11 @@ import java.util.Set;
 @NodeEntity
 public class User extends SnwObject {
     private String username;
+    private String email;
     private String saltedPassword;
     private String lastIp;
     private boolean enabled;
+
     @Relationship(type="HAS_PROFILE")
     private Profile profile;
     @Relationship(type = "FOLLOWS")

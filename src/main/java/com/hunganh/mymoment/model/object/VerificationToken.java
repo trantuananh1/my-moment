@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,5 +26,5 @@ public class VerificationToken {
     private String token;
     private long expiryDate;
     @Relationship(type = "BELONG_USER")
-    private VerificationOwnership verificationOwnerships;
+    private Set<VerificationOwnership> verificationOwnerships;
 }

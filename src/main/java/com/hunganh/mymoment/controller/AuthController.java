@@ -1,5 +1,9 @@
 package com.hunganh.mymoment.controller;
 
+import com.hunganh.mymoment.exception.EmailAlreadyExistsException;
+import com.hunganh.mymoment.exception.EmailNotExistsException;
+import com.hunganh.mymoment.exception.UsernameAlreadyExistsException;
+import com.hunganh.mymoment.response.SnwErrorResponse;
 import com.hunganh.mymoment.response.SnwSuccessResponse;
 import com.hunganh.mymoment.dto.LoginRequest;
 import com.hunganh.mymoment.dto.SignUpRequest;
@@ -11,24 +15,36 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/auth/")
+@RequestMapping(value = "/api/auth", produces = "application/json")
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping(value = "/signup")
-    public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
-        authService.signup(signUpRequest);
-        return new ResponseEntity(new SnwSuccessResponse(), OK);
+    @PostMapping("/signup")
+    public ResponseEntity signup(@RequestBody SignUpRequest signUpRequest) {
+        try {
+            authService.signup(signUpRequest);
+            return new ResponseEntity(new SnwSuccessResponse(), OK);
+        }catch (EmailNotExistsException e){
+            return new ResponseEntity(new SnwErrorResponse(e.getMessage()), PRECONDITION_FAILED);
+        }catch (EmailAlreadyExistsException | UsernameAlreadyExistsException e){
+            return new ResponseEntity(new SnwErrorResponse(e.getMessage()), CONFLICT);
+        }catch (Exception e){
+            return new ResponseEntity(new SnwErrorResponse(e.getMessage()), BAD_REQUEST);
+        }
     }
 
-    @PostMapping(value = "/login", produces = "application/json")
+    @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest) {
-        Map<String, Object> result = authService.login(loginRequest);
-        return new ResponseEntity(TemplateUtil.generateJson(result), OK);
+        try{
+            Map<String, Object> result = authService.login(loginRequest);
+            return new ResponseEntity(TemplateUtil.generateJson(result), OK);
+        }catch (EmailNotExistsException e){
+            return new ResponseEntity(new SnwErrorResponse(e.getMessage()), PRECONDITION_FAILED);
+        }
     }
 
     @GetMapping("/verify/{token}")

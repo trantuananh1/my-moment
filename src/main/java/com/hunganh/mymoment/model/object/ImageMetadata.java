@@ -1,13 +1,17 @@
 package com.hunganh.mymoment.model.object;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.neo4j.ogm.annotation.NodeEntity;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Id;
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.time.Instant;
+import javax.persistence.GenerationType;
 
 /**
  * @Author: Tran Tuan Anh
@@ -17,15 +21,15 @@ import java.time.Instant;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
-@RequiredArgsConstructor
-@NoArgsConstructor
 @Builder
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
+@Node
 public class ImageMetadata {
     @Id
-    @GeneratedValue
-    private long id;
+    @GeneratedValue(UUIDStringGenerator.class)
+    private String id;
 
     @CreatedBy
     private String username;
